@@ -1,2 +1,0 @@
-## BUAA Lectures
-- design pattern
