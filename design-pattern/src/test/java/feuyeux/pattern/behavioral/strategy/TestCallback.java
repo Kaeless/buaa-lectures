@@ -4,7 +4,7 @@ import org.junit.Test;
 
 public class TestCallback {
 
-    private int callTime = 3;
+    private final int callTime = 3;
 
     @Test
     public void testDotCallback() {

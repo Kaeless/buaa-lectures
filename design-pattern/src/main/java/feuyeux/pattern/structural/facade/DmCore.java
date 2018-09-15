@@ -2,9 +2,9 @@ package feuyeux.pattern.structural.facade;
 
 public class DmCore {
     public static final String UNKNOWN = "unknown";
-    private NluCore nluCore;
-    private QasCore qasCore;
-    private FnCore fnCore;
+    private final NluCore nluCore;
+    private final QasCore qasCore;
+    private final FnCore fnCore;
 
     public DmCore(NluCore nluCore, QasCore qasCore, FnCore fnCore) {
         this.nluCore = nluCore;

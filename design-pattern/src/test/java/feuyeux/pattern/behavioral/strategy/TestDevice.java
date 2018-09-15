@@ -11,7 +11,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class TestDevice {
-    Logger log = LogManager.getLogger(getClass());
+    final Logger log = LogManager.getLogger(getClass());
 
     @Test
     public void testCrazyIf() {

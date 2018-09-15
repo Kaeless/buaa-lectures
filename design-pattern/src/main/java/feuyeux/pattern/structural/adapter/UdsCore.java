@@ -4,7 +4,7 @@ package feuyeux.pattern.structural.adapter;
  * Adapter
  */
 public class UdsCore {
-    private QasCore qasCore;
+    private final QasCore qasCore;
 
     public UdsCore(QasCore qasCore) {
         this.qasCore = qasCore;

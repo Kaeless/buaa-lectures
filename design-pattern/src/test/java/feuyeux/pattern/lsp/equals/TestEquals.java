@@ -1,8 +1,10 @@
 package feuyeux.pattern.lsp.equals;
 
+import lombok.extern.log4j.Log4j2;
 import org.junit.Assert;
 import org.junit.Test;
 
+@Log4j2
 public class TestEquals {
     @Test
     public void testFinal() {
@@ -12,6 +14,8 @@ public class TestEquals {
         Assert.assertNotEquals(null, thiz1);
         Assert.assertNotEquals(thiz1, thiz2);
         Assert.assertEquals(thiz3, thiz2);
+        log.info("thiz1.equals(thiz2)?{}", thiz1.equals(thiz2));
+        log.info("thiz3.equals(thiz2)?{}", thiz3.equals(thiz2));
     }
 
     @Test
@@ -24,5 +28,7 @@ public class TestEquals {
         Assert.assertNotEquals(thiz1, thiz2);
         Assert.assertEquals(thiz3, thiz2);
         Assert.assertNotEquals(thiz3, thiz4);
+        log.info("thiz1.equals(thiz2)?{}", thiz1.equals(thiz2));
+        log.info("thiz4.equals(thiz3)?{}", thiz4.equals(thiz3));
     }
 }

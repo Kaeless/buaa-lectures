@@ -3,7 +3,7 @@ package feuyeux.pattern.structural.flyweight;
 import lombok.Getter;
 import lombok.Setter;
 
-public class NluConnection {
+public final class NluConnection {
     @Getter
     @Setter
     private String name;

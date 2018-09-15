@@ -7,19 +7,25 @@ import java.util.Map;
 
 @Log4j2
 public class UdsCore {
-    private Map<String, NluConnection> nluConnectionPool = new HashMap<>(10);
+    private final Map<String, NluConnection> nluConnectionPool = new HashMap<>(10);
 
     public void dialog(String group, String query) {
-        NluConnection nluConnection = nluConnectionPool.get(group);
+        NluConnection nluConnection = getNluConnection(group);
+        final String connectionName = nluConnection.getName();
+        log.info("connection name={}", connectionName);
+        log.info(nluConnection.ask(query));
+    }
+
+    private NluConnection getNluConnection(String connectionName) {
+        NluConnection nluConnection = nluConnectionPool.get(connectionName);
         if (nluConnection == null) {
             log.info("new nlu connection");
             nluConnection = new NluConnection();
-            nluConnection.setName(group);
-            nluConnectionPool.put(group, nluConnection);
+            nluConnection.setName(connectionName);
+            nluConnectionPool.put(connectionName, nluConnection);
         } else {
             log.info("reuse nlu connection");
         }
-        log.info("connection name={}", nluConnection.getName());
-        log.info(nluConnection.ask(query));
+        return nluConnection;
     }
 }

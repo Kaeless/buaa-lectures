@@ -7,7 +7,7 @@ import java.util.Map;
 
 @Log4j2
 public class Dm {
-    private Map<String, Context> contextMap = new HashMap<>();
+    private final Map<String, Context> contextMap = new HashMap<>();
 
     public void dialog(String session, String query) {
         Context context = getContext(session);

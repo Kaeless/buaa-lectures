@@ -1,7 +1,7 @@
 package feuyeux.pattern.structural.proxy;
 
 public class UdsProxy {
-    private UdsCore uds;
+    private final UdsCore uds;
 
     public UdsProxy(UdsCore uds) {
         this.uds = uds;

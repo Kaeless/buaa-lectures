@@ -1,8 +1,8 @@
 package feuyeux.pattern.behavioral.strategy.crazyif;
 
 public class Device {
-    private String ip;
-    private String deviceType;
+    private final String ip;
+    private final String deviceType;
     private String protocol;
 
     public Device(String ip, String deviceType) {

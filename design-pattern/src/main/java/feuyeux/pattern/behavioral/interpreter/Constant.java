@@ -1,7 +1,7 @@
 package feuyeux.pattern.behavioral.interpreter;
 
 public class Constant extends Expression {
-    private boolean value;
+    private final boolean value;
 
     public Constant(boolean value) {
         this.value = value;

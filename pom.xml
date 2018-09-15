@@ -8,6 +8,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>design-pattern</module>
+        <module>domain-driven-design</module>
     </modules>
     <build>
         <plugins>

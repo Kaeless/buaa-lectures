@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Context {
-    private Map<Variable, Boolean> map = new HashMap<>();
+    private final Map<Variable, Boolean> map = new HashMap<>();
 
     public void assign(Variable var, boolean value) {
         map.put(var, value);

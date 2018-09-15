@@ -16,6 +16,6 @@ public class CompositeService {
     }
 
     public void reload() {
-        parts.stream().forEach(a -> log.info(a.reload()));
+        parts.forEach(a -> log.info(a.reload()));
     }
 }

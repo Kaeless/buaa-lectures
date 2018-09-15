@@ -2,7 +2,7 @@ package feuyeux.pattern.behavioral.observer;
 
 public class BabyEvent extends java.util.EventObject {
     private static final long serialVersionUID = 1L;
-    private BabySource source;
+    private final BabySource source;
 
     public BabyEvent(BabySource source) {
         super(source);

@@ -8,7 +8,7 @@ import java.util.List;
 
 @Log4j2
 public class Group {
-    private List<Node> l = new ArrayList<>();
+    private final List<Node> l = new ArrayList<>();
 
     public void add(Node node) {
         l.add(node);
@@ -25,6 +25,6 @@ public class Group {
             log.info(next.getIp());
         }
 
-        l.stream().forEach(n -> log.info(n.getIp()));
+        l.forEach(n -> log.info(n.getIp()));
     }
 }

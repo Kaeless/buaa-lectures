@@ -4,8 +4,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class SoapCook {
-    private static SoapCook instance = new SoapCook();
-    private Logger logger = LogManager.getLogger(getClass());
+    private static final SoapCook instance = new SoapCook();
+    private final Logger logger = LogManager.getLogger(getClass());
 
     public static SoapCook getInstance() {
         return instance;

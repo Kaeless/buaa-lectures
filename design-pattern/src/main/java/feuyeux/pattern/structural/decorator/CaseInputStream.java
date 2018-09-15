@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class CaseInputStream extends FilterInputStream {
-    private CASE_FLAG caseFlag;
+    private final CASE_FLAG caseFlag;
 
     public CaseInputStream(InputStream in, CASE_FLAG caseFlag) {
         super(in);

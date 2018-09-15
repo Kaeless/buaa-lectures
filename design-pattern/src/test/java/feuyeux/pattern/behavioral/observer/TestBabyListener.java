@@ -5,7 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 
 public class TestBabyListener {
-    private Logger logger = LogManager.getLogger(TestBabyListener.class);
+    private final Logger logger = LogManager.getLogger(TestBabyListener.class);
 
     @Test
     public void testListener() {

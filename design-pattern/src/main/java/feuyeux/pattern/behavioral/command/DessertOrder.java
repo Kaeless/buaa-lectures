@@ -4,8 +4,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class DessertOrder implements Order {
-    private Logger logger = LogManager.getLogger(getClass());
-    private DessertCook cook = DessertCook.getInstance();
+    private final Logger logger = LogManager.getLogger(getClass());
+    private final DessertCook cook = DessertCook.getInstance();
 
     @Override
     public void execute() {

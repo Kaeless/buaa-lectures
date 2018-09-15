@@ -13,7 +13,7 @@ import static feuyeux.pattern.structural.decorator.CaseInputStream.CASE_FLAG.UPP
 
 public class TestCaseInputStream {
     final byte[] bytes = "tHis IS a tESt.".getBytes();
-    private Logger logger = LogManager.getLogger(TestCaseInputStream.class);
+    private final Logger logger = LogManager.getLogger(TestCaseInputStream.class);
 
     @Test
     public void testUpperCaseRead() {

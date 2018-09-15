@@ -1,7 +1,7 @@
 package feuyeux.pattern.behavioral.command;
 
 public class Customer {
-    private Waitress service;
+    private final Waitress service;
 
     public Customer(Waitress service) {
         this.service = service;

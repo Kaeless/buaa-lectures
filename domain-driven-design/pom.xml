@@ -7,7 +7,7 @@
         <artifactId>buaa-leacture</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
-    <artifactId>design-pattern</artifactId>
+    <artifactId>domain-driven-design</artifactId>
     <properties>
         <junit.version>4.12</junit.version>
         <log4j2.version>2.10.0</log4j2.version>

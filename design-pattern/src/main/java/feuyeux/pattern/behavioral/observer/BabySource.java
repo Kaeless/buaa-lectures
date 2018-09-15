@@ -8,9 +8,9 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class BabySource {
-    private Logger logger = LogManager.getLogger(BabySource.class);
-    private String name;
-    private Set<BabyListener> wakeUpListenerSet = new LinkedHashSet<>();
+    private final Logger logger = LogManager.getLogger(BabySource.class);
+    private final String name;
+    private final Set<BabyListener> wakeUpListenerSet = new LinkedHashSet<>();
 
     public BabySource(String name) {
         this.name = name;

@@ -1,7 +1,7 @@
 package feuyeux.pattern.behavioral.strategy.crazyif.strategy;
 
 public abstract class Device implements IDevice {
-    protected String ip;
+    protected final String ip;
     protected String protocol;
 
     public Device(String ip) {

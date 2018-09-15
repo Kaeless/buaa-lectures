@@ -1,5 +1,12 @@
+.DS_Store
 *.ipr
 *.iws
+*.iml
 target
 .idea
-*.iml
+.settings
+.classpath
+.project
+.vscode
+settings.json
+.factorypath
