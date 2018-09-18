@@ -2,7 +2,9 @@
 *.ipr
 *.iws
 *.iml
+bin
 target
+*.class
 .idea
 .settings
 .classpath
@@ -11,3 +13,5 @@ target
 settings.json
 .factorypath
 .github
+org_feuyeux_given_proto
+__pycache__

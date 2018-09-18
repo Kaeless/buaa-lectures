@@ -1,0 +1,3 @@
+- https://developers.google.com/protocol-buffers/docs/proto3
+- https://grpc.io/docs/tutorials/basic/java.html
+- https://github.com/grpc/grpc-java
