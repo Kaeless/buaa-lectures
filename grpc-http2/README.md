@@ -53,9 +53,9 @@ py/proto2py.sh
 
 #### test
 ```shell
-python3 server/protoServer.py
+py/test_server.sh
 ```
 
 ```shell
-python3 client/protoClient.py
+py/test_client.sh
 ```
