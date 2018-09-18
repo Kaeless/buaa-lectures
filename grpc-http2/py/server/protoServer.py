@@ -9,7 +9,7 @@ from pb import *
 
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
-class LandingServiceServicer(landing_pb2.LandingServiceServicer):
+class LandingServiceServicer(landing__pb2.LandingServiceServicer):
     def talk(self, request, context):
         return landing_pb2.TalkResponse(
             status=200,
