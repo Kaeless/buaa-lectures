@@ -3,13 +3,13 @@ import time
 import random
 import grpc
 from concurrent import futures
-
 sys.path.append(os.path.abspath('.'))
-from pb import *
+from pb import landing_pb2
+from pb import landing_pb2_grpc
 
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
-class LandingServiceServicer(landing_pb2.LandingServiceServicer):
+class LandingServiceServicer(landing_pb2_grpc.LandingServiceServicer):
     def talk(self, request, context):
         return landing_pb2.TalkResponse(
             status=200,
@@ -26,7 +26,7 @@ class LandingServiceServicer(landing_pb2.LandingServiceServicer):
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    landing_pb2.add_LandingServiceServicer_to_server(LandingServiceServicer(), server)
+    landing_pb2_grpc.add_LandingServiceServicer_to_server(LandingServiceServicer(), server)
     server.add_insecure_port('[::]:50061')
     server.start()
     try:

@@ -1,11 +1,9 @@
 import os
-
 import grpc
 import sys
-
 sys.path.append(os.path.abspath('.'))
 from pb import landing_pb2
-
+from pb import landing_pb2_grpc
 
 def talk(stub):
     request = landing_pb2.TalkRequest(data="query=ai,from=0,size=1000,order=x,sort=y", meta="user=eric")
@@ -19,7 +17,7 @@ def talk(stub):
 
 def run():
     channel = grpc.insecure_channel('localhost:50061')
-    stub = landing_pb2.LandingServiceStub(channel)
+    stub = landing_pb2_grpc.LandingServiceStub(channel)
     talk(stub)
 
 if __name__ == '__main__':
