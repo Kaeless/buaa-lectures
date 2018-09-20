@@ -1,15 +1,20 @@
+/*
+ * grpc demo
+ */
+
 package main
 
 import (
-	"golang.org/x/net/context"
-	"google.golang.org/grpc"
+	"io"
 	"log"
 	"net"
-	"time"
-	pb "../../org_feuyeux_given_proto"
 	"strconv"
+	"time"
+
+	pb "../../org_feuyeux_given_proto"
+	"golang.org/x/net/context"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
-	google_protobuf "github.com/golang/protobuf/ptypes/empty"
 )
 
 const (
@@ -17,10 +22,6 @@ const (
 )
 
 type protoServer struct{}
-
-func (s *protoServer) TalkChunk(e *google_protobuf.Empty, c pb.LandingService_TalkChunkServer) error {
-	return nil
-}
 
 func (s *protoServer) Talk(ctx context.Context, in *pb.TalkRequest) (*pb.TalkResponse, error) {
 	result := new(pb.TalkResult)
@@ -36,6 +37,102 @@ func (s *protoServer) Talk(ctx context.Context, in *pb.TalkRequest) (*pb.TalkRes
 		Status:  200,
 		Results: []*pb.TalkResult{result},
 	}, nil
+}
+
+func (s *protoServer) TalkOneAnswerMore(in *pb.TalkRequest, stream pb.LandingService_TalkOneAnswerMoreServer) error {
+	rs := make([]*pb.TalkResponse, 2)
+
+	kv := make(map[string]string)
+	result := new(pb.TalkResult)
+	result.Id = time.Now().UnixNano()
+	result.Type = pb.ResultType_STATISTICS
+	kv["data"] = in.Data
+	kv["meta"] = in.Meta
+	kv["timestamp"] = strconv.Itoa(time.Now().Nanosecond())
+	result.Kv = kv
+	rs[0] = &pb.TalkResponse{
+		Status:  200,
+		Results: []*pb.TalkResult{result},
+	}
+
+	result2 := new(pb.TalkResult)
+	result2.Id = time.Now().UnixNano()
+	result2.Type = pb.ResultType_ANALYSIS
+	kv["timestamp"] = strconv.Itoa(time.Now().Nanosecond())
+	result2.Kv = kv
+	rs[1] = &pb.TalkResponse{
+		Status:  200,
+		Results: []*pb.TalkResult{result2},
+	}
+
+	for _, r := range rs {
+		if err := stream.Send(r); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (s *protoServer) TalkMoreAnswerOne(stream pb.LandingService_TalkMoreAnswerOneServer) error {
+	rs := []*pb.TalkResult{}
+	for {
+		in, err := stream.Recv()
+
+		if err == io.EOF {
+			talkResponse := &pb.TalkResponse{
+				Status:  200,
+				Results: rs,
+			}
+			stream.SendAndClose(talkResponse)
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+
+		kv := make(map[string]string)
+		kv["data"] = in.Data
+		kv["meta"] = in.Meta
+		kv["timestamp"] = strconv.Itoa(time.Now().Nanosecond())
+
+		result := new(pb.TalkResult)
+		result.Id = time.Now().UnixNano()
+		result.Type = pb.ResultType_SEARCH
+		result.Kv = kv
+		rs = append(rs, result)
+	}
+}
+
+func (s *protoServer) TalkBidirectional(stream pb.LandingService_TalkBidirectionalServer) error {
+	rs := []*pb.TalkResponse{}
+	for {
+		in, err := stream.Recv()
+		if err == io.EOF {
+			log.Print(rs)
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+
+		kv := make(map[string]string)
+		kv["data"] = in.Data
+		kv["meta"] = in.Meta
+		kv["timestamp"] = strconv.Itoa(time.Now().Nanosecond())
+
+		result := new(pb.TalkResult)
+		result.Id = time.Now().UnixNano()
+		result.Type = pb.ResultType_SEARCH
+		result.Kv = kv
+
+		talkResponse := &pb.TalkResponse{
+			Status:  200,
+			Results: []*pb.TalkResult{result},
+		}
+		if err := stream.Send(talkResponse); err != nil {
+			return err
+		}
+	}
 }
 
 func main() {

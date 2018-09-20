@@ -1,8 +1,6 @@
 package org.feuyeux.given.proto.server;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.feuyeux.given.proto.TalkRequest;
 import org.feuyeux.given.proto.TalkResponse;
 import org.feuyeux.given.proto.client.ProtoClient;
@@ -18,7 +16,7 @@ import org.junit.Test;
 public class ProtoTest {
 
     @Test
-    public void testProto() {
+    public void testProto() throws InterruptedException {
         ProtoServer protoServer = new ProtoServer(7002);
         ProtoClient protoClient = new ProtoClient("localhost", 7002);
         TalkRequest talkRequest = ProtoUtil.buildRequest();
@@ -27,7 +25,7 @@ public class ProtoTest {
         Assert.assertTrue(talkResponse.getStatus() == 200);
         log.info("RESPONSE:{}", talkResponse);
 
-        protoClient.close();
+        protoClient.shutdown();
         protoServer.stop();
     }
 }
