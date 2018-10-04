@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Appenders>
+        <Console name="STOUT" target="SYSTEM_OUT" follow="true">
+            <PatternLayout
+                    pattern="%clr{%date{MM-dd HH:mm:ss.SSS}}{faint}%clr{%5level}%clr{[%thread]}{magenta}%clr{%class{10} - }{cyan}%message%n"/>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <Root level="INFO" additivity="false"/>
+        <Logger name="org.feuyeux.restful" additivity="false">
+            <AppenderRef level="INFO" ref="STOUT"/>
+        </Logger>
+    </Loggers>
+</Configuration>

@@ -1,0 +1,10 @@
+spring:
+  output:
+    ansi:
+      enabled: DETECT
+  jersey:
+    application-path: /api
+server:
+  port: 9666
+  servlet-path: /
+  error.whitelabel.enabled: false
