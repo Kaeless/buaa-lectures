@@ -4,4 +4,4 @@
 - springboot swagger静态资源：
   - http://localhost:9666/index.html
   - 注意要修改index.html的url = "/api/swagger.json";
-- 测试你好接口 curl "http://localhost:9666/api/biz/hello?name=buaa"
+- 测试你好接口 `curl "http://localhost:9666/api/biz/hello?name=buaa"`
