@@ -17,3 +17,4 @@ org_feuyeux_given_proto
 __pycache__
 pb
 *.log
+*.gz
