@@ -1,14 +1,13 @@
-package org.feuyeux.given.proto.server;
-
-import java.io.IOException;
+package org.feuyeux.given.proto;
 
 import lombok.extern.slf4j.Slf4j;
-import org.feuyeux.given.proto.TalkRequest;
-import org.feuyeux.given.proto.TalkResponse;
 import org.feuyeux.given.proto.client.ProtoClient;
+import org.feuyeux.given.proto.server.ProtoServer;
 import org.feuyeux.given.proto.utils.ProtoUtil;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.io.IOException;
 
 /**
  * Created by erichan feuyeux
@@ -16,7 +15,7 @@ import org.junit.Test;
  */
 @Slf4j
 public class ProtoTest {
-    //@Test
+    @Test
     public void testProto() throws InterruptedException, IOException {
         ProtoServer protoServer = new ProtoServer(17002);
         ProtoClient protoClient = new ProtoClient("localhost", 17002);
