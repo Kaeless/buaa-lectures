@@ -1,5 +1,7 @@
 package org.feuyeux.given.proto.server;
 
+import java.io.IOException;
+
 import lombok.extern.slf4j.Slf4j;
 import org.feuyeux.given.proto.TalkRequest;
 import org.feuyeux.given.proto.TalkResponse;
@@ -14,14 +16,14 @@ import org.junit.Test;
  */
 @Slf4j
 public class ProtoTest {
-
-    @Test
-    public void testProto() throws InterruptedException {
-        ProtoServer protoServer = new ProtoServer(7002);
-        ProtoClient protoClient = new ProtoClient("localhost", 7002);
+    //@Test
+    public void testProto() throws InterruptedException, IOException {
+        ProtoServer protoServer = new ProtoServer(17002);
+        ProtoClient protoClient = new ProtoClient("localhost", 17002);
         TalkRequest talkRequest = ProtoUtil.buildRequest();
         log.info("REQUEST:{}", talkRequest);
         TalkResponse talkResponse = protoClient.talk(talkRequest);
+
         Assert.assertTrue(talkResponse.getStatus() == 200);
         log.info("RESPONSE:{}", talkResponse);
 

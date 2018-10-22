@@ -7,8 +7,12 @@
     <artifactId>buaa-leacture</artifactId>
     <packaging>pom</packaging>
     <modules>
+        <module>ood</module>
         <module>design-pattern</module>
         <module>domain-driven-design</module>
+        <module>grpc-http2/java</module>
+        <module>restful</module>
+        <module>metrics</module>
     </modules>
     <build>
         <plugins>

@@ -17,13 +17,13 @@ import org.feuyeux.given.proto.utils.ProtoUtil;
 public class ProtoServer {
     private final Server server;
 
-    public ProtoServer(final int port) {
+    public ProtoServer(final int port) throws IOException {
         this.server = ServerBuilder.forPort(port).addService(new LandingServiceImpl()).build();
+        start();
     }
 
     public static void main(String[] args) throws InterruptedException, IOException {
         ProtoServer server = new ProtoServer(50061);
-        server.start();
         server.blockUntilShutdown();
     }
 
