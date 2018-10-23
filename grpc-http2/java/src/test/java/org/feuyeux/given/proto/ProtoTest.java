@@ -63,5 +63,4 @@ public class ProtoTest {
             return null;
         }
     }
-
 }
