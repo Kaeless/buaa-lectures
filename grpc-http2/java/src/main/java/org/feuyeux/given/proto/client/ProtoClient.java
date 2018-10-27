@@ -27,6 +27,7 @@ public class ProtoClient {
         channel = ManagedChannelBuilder.forAddress(host, port).usePlaintext().build();
         blockingStub = LandingServiceGrpc.newBlockingStub(channel);
         asyncStub = LandingServiceGrpc.newStub(channel);
+
     }
 
     public static void main(String[] args) throws InterruptedException {
