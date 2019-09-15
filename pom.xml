@@ -13,6 +13,7 @@
         <module>grpc-http2/java</module>
         <module>restful</module>
         <module>metrics</module>
+        <module>nls-sds</module>
     </modules>
     <build>
         <plugins>

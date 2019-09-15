@@ -9,7 +9,6 @@
 
     <properties>
         <grpc.version>1.15.1</grpc.version><!-- CURRENT_GRPC_VERSION -->
-        <protobuf.version>3.5.1</protobuf.version>
         <protoc.version>3.5.1</protoc.version>
         <jdk.version>1.8</jdk.version>
     </properties>
@@ -34,7 +33,7 @@
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
-            <version>${protobuf.version}</version>
+            <version>${protoc.version}</version>
         </dependency>
 
         <!-- slf4j -->
