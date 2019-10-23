@@ -1,7 +1,3 @@
-/**
- * @author 六翁 lu.hl@alibaba-inc.com
- * @date 2019/09/15
- */
 public class DHT {
     public static void main(String[] args) {
         int m = 6;
