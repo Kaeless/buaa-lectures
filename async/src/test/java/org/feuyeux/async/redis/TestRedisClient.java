@@ -1,19 +1,15 @@
 package org.feuyeux.async.redis;
 
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
 import lombok.extern.slf4j.Slf4j;
 import org.feuyeux.async.pool.ThreadCoon;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.time.Instant;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class TestRedisClient {
@@ -25,8 +21,8 @@ public class TestRedisClient {
     @Before
     public void before() {
         RedisConfig redisProps = new RedisConfig();
-        redisProps.setHost("...");
-        redisProps.setPwd("...");
+        redisProps.setHost("");
+        redisProps.setPwd("");
         redisProps.setPort(6379);
         redisProps.setConnectionTimeout(1000);
         lettuceCoon = new LettuceCoon(redisProps);

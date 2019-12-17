@@ -11,13 +11,14 @@
         <module>design-pattern</module>
         <module>domain-driven-design</module>
         <module>grpc-http2/java</module>
+        <module>async</module>
         <module>restful</module>
         <module>metrics</module>
         <module>nls-sds</module>
     </modules>
     <build>
         <plugins>
-             <plugin>
+            <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.7.9</version>

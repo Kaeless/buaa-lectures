@@ -8,27 +8,27 @@ import org.junit.Test;
 public class TestEquals {
     @Test
     public void testFinal() {
-        FinalBase thiz1 = new FinalBase(1, 2);
-        FinalBase thiz2 = new FinalBase(2, 1);
-        FinalBase thiz3 = new FinalBase(2, 1);
-        Assert.assertNotEquals(null, thiz1);
-        Assert.assertNotEquals(thiz1, thiz2);
-        Assert.assertEquals(thiz3, thiz2);
-        log.info("thiz1.equals(thiz2)?{}", thiz1.equals(thiz2));
-        log.info("thiz3.equals(thiz2)?{}", thiz3.equals(thiz2));
+        FinalBase a = new FinalBase(1, 2);
+        FinalBase b = new FinalBase(2, 1);
+        FinalBase c = new FinalBase(2, 1);
+
+        Assert.assertNotEquals(a, b);
+        log.info("a.equals(b)?{}", a.equals(b));
+
+        Assert.assertEquals(c, b);
+        log.info("c.equals(b)?{}", c.equals(b));
     }
 
     @Test
     public void testNormal() {
-        Base thiz1 = new Base(1, 2);
-        Base thiz2 = new Base(2, 1);
-        Base thiz3 = new Base(2, 1);
-        Son thiz4 = new Son(2, 1);
-        Assert.assertNotEquals(null, thiz1);
-        Assert.assertNotEquals(thiz1, thiz2);
-        Assert.assertEquals(thiz3, thiz2);
-        Assert.assertNotEquals(thiz3, thiz4);
-        log.info("thiz1.equals(thiz2)?{}", thiz1.equals(thiz2));
-        log.info("thiz4.equals(thiz3)?{}", thiz4.equals(thiz3));
+        Base a = new Base(2, 1);
+        Base b = new Son(2, 1);
+        Son c = new Son(2, 1);
+
+        Assert.assertNotEquals(b, a);
+        log.info("b.equals(a)?{}", b.equals(a));
+
+        Assert.assertEquals(b, c);
+        log.info("c.equals(b)?{}", c.equals(b));
     }
 }

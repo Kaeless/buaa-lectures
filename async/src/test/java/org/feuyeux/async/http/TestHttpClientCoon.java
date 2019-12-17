@@ -1,9 +1,9 @@
 package org.feuyeux.async.http;
 
-import java.util.concurrent.TimeUnit;
-
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author feuyeux

@@ -26,7 +26,6 @@ public final class FinalBase {
 
         FinalBase other = (FinalBase)obj;
         return x == other.x && y == other.y;
-
     }
 
     @Override

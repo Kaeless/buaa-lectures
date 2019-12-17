@@ -1,25 +1,14 @@
 package org.feuyeux.async.http;
 
+import lombok.extern.slf4j.Slf4j;
+import okhttp3.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import lombok.extern.slf4j.Slf4j;
-import okhttp3.Cache;
-import okhttp3.Call;
-import okhttp3.ConnectionPool;
-import okhttp3.FormBody;
-import okhttp3.Headers;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
 
 /**
  * @author feuyeux
@@ -49,9 +38,9 @@ public class HttpClientCoon {
     /**
      * startup client
      *
-     * @param connectTimeout
-     * @param readTimeout
-     * @param writeTimeout
+     * @param connectTimeout connect Timeout
+     * @param readTimeout    read Timeout
+     * @param writeTimeout   write Timeout
      */
     private void init(long connectTimeout, long readTimeout, long writeTimeout) {
         log.info("HttpClientCoon start now.");
@@ -59,19 +48,16 @@ public class HttpClientCoon {
         ConnectionPool connectionPool = new ConnectionPool(MAX_IDLE_CONNECTION, KEEP_ALIVE_DURATION, TimeUnit.MINUTES);
 
         client = builder
-            .connectTimeout(connectTimeout, TimeUnit.MILLISECONDS)
-            .readTimeout(readTimeout, TimeUnit.MILLISECONDS)
-            .writeTimeout(writeTimeout, TimeUnit.MILLISECONDS)
-            .connectionPool(connectionPool)
-            .build();
+                .connectTimeout(connectTimeout, TimeUnit.MILLISECONDS)
+                .readTimeout(readTimeout, TimeUnit.MILLISECONDS)
+                .writeTimeout(writeTimeout, TimeUnit.MILLISECONDS)
+                .connectionPool(connectionPool)
+                .build();
     }
 
     /**
      * destroy client
      * https://square.github.io/okhttp/4.x/okhttp/okhttp3/-ok-http-client
-     *
-     * @throws IOException
-     * @throws InterruptedException
      */
     public void destroy() throws IOException, InterruptedException {
         log.info("HttpClientCoon shutdown now.");
@@ -106,7 +92,8 @@ public class HttpClientCoon {
     }
 
     private String body(Response response) throws Exception {
-        return response.body().string();
+        ResponseBody body = response.body();
+        return body == null ? null : body.string();
     }
 
     public String get(String url, Map<String, String> params) throws Exception {
@@ -129,31 +116,21 @@ public class HttpClientCoon {
     public String getWithHeader(String url, Map<String, String> headMap) throws Exception {
         Headers headers = Headers.of(headMap);
         Request request = new Request.Builder()
-            .url(url)
-            .headers(headers)
-            .build();
+                .url(url)
+                .headers(headers)
+                .build();
         log.info("{}", request);
         try (Response response = client.newCall(request).execute()) {
             return response.body() != null ? response.body().string() : null;
         }
     }
 
-    public String getWithHeader(String url, Map<String, String> headMap, Map<String, String> paramMap)
-        throws Exception {
-        StringBuilder sb = new StringBuilder();
-        if (url.startsWith(HTTP_PREFIX) || url.startsWith(HTTPS_PREFIX)) {
-            sb.append(url).append("?");
-        } else {
-            sb.append(HTTP_PREFIX).append(url).append("?");
-        }
-        if (paramMap != null && !paramMap.isEmpty()) {
-            for (Map.Entry<String, String> entry : paramMap.entrySet()) {
-                sb.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
-            }
-        }
-        String url0 = sb.deleteCharAt(sb.length() - 1).toString();
+    public String getWithHeader(String url, Map<String, String> headMap, Map<String, String> paramMap) throws Exception {
+        return getWithHeader(buildUrl(url, paramMap), headMap);
+    }
 
-        return getWithHeader(url0, headMap);
+    public String postWithQuery(String url, Map<String, String> params) throws Exception {
+        return post(buildUrl(url, params));
     }
 
     public String post(String url) throws Exception {
@@ -188,8 +165,8 @@ public class HttpClientCoon {
         File zipFile = new File(filepath);
         RequestBody body = RequestBody.create(ZIP_CONTENT_TYPE, zipFile);
         RequestBody requestBody = new MultipartBody.Builder()
-            .setType(MultipartBody.FORM)
-            .addFormDataPart("zipFile", zipFile.getName(), body).build();
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("zipFile", zipFile.getName(), body).build();
         return post(url, headerMap, requestBody);
     }
 
@@ -199,33 +176,17 @@ public class HttpClientCoon {
     }
 
     public String postWithHeader(String url, Map<String, String> headerMap, Map<String, String> paramMap)
-        throws Exception {
+            throws Exception {
         FormBody.Builder builder = new FormBody.Builder();
         paramMap.forEach(builder::add);
         RequestBody body = builder.build();
         return post(url, headerMap, body);
     }
 
-    public String postWithQuery(String url, Map<String, String> params) throws Exception {
-        StringBuilder sb = new StringBuilder();
-        if (url.startsWith(HTTP_PREFIX) || url.startsWith(HTTPS_PREFIX)) {
-            sb.append(url).append("?");
-        } else {
-            sb.append(HTTP_PREFIX).append(url).append("?");
-        }
-        if (params != null && !params.isEmpty()) {
-            for (Map.Entry<String, String> entry : params.entrySet()) {
-                sb.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
-            }
-        }
-        String url0 = sb.deleteCharAt(sb.length() - 1).toString();
-        return post(url0);
-    }
-
     private String post(String url, Map<String, String> headerMap, RequestBody requestBody) throws Exception {
         Request.Builder builder = new Request.Builder()
-            .url(url)
-            .post(requestBody);
+                .url(url)
+                .post(requestBody);
 
         if (headerMap != null) {
             headerMap.forEach(builder::header);
@@ -247,9 +208,9 @@ public class HttpClientCoon {
         RequestBody requestBody = RequestBody.create(null, new byte[0]);
 
         Request request = new Request.Builder()
-            .url(url)
-            .put(requestBody)
-            .build();
+                .url(url)
+                .put(requestBody)
+                .build();
 
         try (Response response = client.newCall(request).execute()) {
             ResponseBody responseBody = response.body();
@@ -260,9 +221,9 @@ public class HttpClientCoon {
     public String put(String url, String payload) throws Exception {
         RequestBody body = RequestBody.create(JSON_CONTENT_TYPE, payload);
         Request request = new Request.Builder()
-            .url(url)
-            .put(body)
-            .build();
+                .url(url)
+                .put(body)
+                .build();
 
         try (Response response = client.newCall(request).execute()) {
             ResponseBody responseBody = response.body();
@@ -276,9 +237,9 @@ public class HttpClientCoon {
         RequestBody requestBody = builder.build();
 
         Request request = new Request.Builder()
-            .url(url)
-            .put(requestBody)
-            .build();
+                .url(url)
+                .put(requestBody)
+                .build();
 
         try (Response response = client.newCall(request).execute()) {
             ResponseBody responseBody = response.body();
@@ -288,9 +249,9 @@ public class HttpClientCoon {
 
     public String delete(String url) throws Exception {
         Request request = new Request.Builder()
-            .url(url)
-            .delete()
-            .build();
+                .url(url)
+                .delete()
+                .build();
 
         try (Response response = client.newCall(request).execute()) {
             ResponseBody responseBody = response.body();
@@ -301,9 +262,9 @@ public class HttpClientCoon {
     public String delete(String url, String payload) throws Exception {
         RequestBody body = RequestBody.create(JSON_CONTENT_TYPE, payload);
         Request request = new Request.Builder()
-            .url(url)
-            .delete(body)
-            .build();
+                .url(url)
+                .delete(body)
+                .build();
 
         try (Response response = client.newCall(request).execute()) {
             ResponseBody responseBody = response.body();
@@ -317,9 +278,9 @@ public class HttpClientCoon {
         RequestBody requestBody = builder.build();
 
         Request request = new Request.Builder()
-            .url(url)
-            .delete(requestBody)
-            .build();
+                .url(url)
+                .delete(requestBody)
+                .build();
 
         try (Response response = client.newCall(request).execute()) {
             ResponseBody responseBody = response.body();
@@ -327,4 +288,18 @@ public class HttpClientCoon {
         }
     }
 
+    private String buildUrl(String url, Map<String, String> paramMap) {
+        StringBuilder sb = new StringBuilder();
+        if (url.startsWith(HTTP_PREFIX) || url.startsWith(HTTPS_PREFIX)) {
+            sb.append(url).append("?");
+        } else {
+            sb.append(HTTP_PREFIX).append(url).append("?");
+        }
+        if (paramMap != null && !paramMap.isEmpty()) {
+            for (Map.Entry<String, String> entry : paramMap.entrySet()) {
+                sb.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
+            }
+        }
+        return sb.deleteCharAt(sb.length() - 1).toString();
+    }
 }

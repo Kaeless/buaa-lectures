@@ -1,8 +1,8 @@
 package org.feuyeux.async.http;
 
-import java.util.concurrent.CompletableFuture;
-
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Don't use this style, because from async to sync is slower than sync

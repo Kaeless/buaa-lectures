@@ -1,13 +1,5 @@
 package org.feuyeux.async.redis;
 
-import java.time.Duration;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
 import com.google.common.base.Strings;
 import io.lettuce.core.RedisFuture;
 import io.lettuce.core.RedisURI;
@@ -15,7 +7,17 @@ import io.lettuce.core.ScriptOutputType;
 import io.lettuce.core.TransactionResult;
 import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.api.async.RedisAsyncCommands;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+
+import java.time.Duration;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * @author feuyeux
@@ -26,9 +28,9 @@ public class LettuceCoon {
     private io.lettuce.core.RedisClient client;
     private StatefulRedisConnection<String, String> connection;
 
-    //@Setter
-    //@Getter
-    //private int dbIndex = 1;
+    @Setter
+    @Getter
+    private int dbIndex = 1;
 
     public LettuceCoon(RedisConfig redisConf) {
         this.redisConf = redisConf;
@@ -36,18 +38,22 @@ public class LettuceCoon {
 
     public void init() {
         RedisURI redisUri = RedisURI.Builder.redis(redisConf.getHost())
-            .withPort(redisConf.getPort())
-            .withTimeout(Duration.ofMillis(redisConf.getConnectionTimeout()))
-            .withPassword(redisConf.getPwd())
-            //.withDatabase(dbIndex)
-            .build();
+                .withPort(redisConf.getPort())
+                .withTimeout(Duration.ofMillis(redisConf.getConnectionTimeout()))
+                .withPassword(redisConf.getPwd())
+                .withDatabase(dbIndex)
+                .build();
         client = io.lettuce.core.RedisClient.create(redisUri);
         connection = client.connect();
     }
 
     public void destroy() {
-        if (connection != null) {connection.close();}
-        if (client != null) {client.shutdown();}
+        if (connection != null) {
+            connection.close();
+        }
+        if (client != null) {
+            client.shutdown();
+        }
     }
 
     public String flushDB() {
@@ -86,12 +92,15 @@ public class LettuceCoon {
         return futureGet(f);
     }
 
-    /***** queue *****/
+    /**
+     * queue
+     * lpop <-- rpush
+     * lrange [old <-- new]
+     **/
     public long pushToQueue(String key, String value) {
         if (Strings.isNullOrEmpty(key) || Strings.isNullOrEmpty(value)) {
             return -1L;
         }
-
         return pushToQueue(key, value, 0);
     }
 
@@ -99,23 +108,15 @@ public class LettuceCoon {
         if (Strings.isNullOrEmpty(key) || Strings.isNullOrEmpty(value)) {
             return -1L;
         }
-        final RedisFuture<Long> f = getCommands().lpush(key, value);
-        if (seconds > 0) {
-            Long length = futureGet(f);
-            if (length > 0) {
-                getCommands().expire(key, seconds);
-            }
-            return length;
-        } else {
-            return futureGet(f);
-        }
+        final RedisFuture<Long> f = getCommands().rpush(key, value);
+        return saveExpire(key, seconds, f);
     }
 
     public String popFromQueue(String key) {
         if (Strings.isNullOrEmpty(key)) {
             return null;
         }
-        final RedisFuture<String> f = getCommands().rpop(key);
+        final RedisFuture<String> f = getCommands().lpop(key);
         return futureGet(f);
     }
 
@@ -148,7 +149,16 @@ public class LettuceCoon {
             return -1;
         }
         final RedisFuture<Long> f = getCommands().llen(key);
-        return futureGet(f);
+        Long l = futureGet(f);
+        return l == null ? -1L : l;
+    }
+
+    public String getFirstOne(String key) {
+        return getQueueByIndex(key, 0);
+    }
+
+    public String getLastOne(String key) {
+        return getQueueByIndex(key, getQueueLength(key) - 1);
     }
 
     /***** set *****/
@@ -161,15 +171,7 @@ public class LettuceCoon {
             return -1;
         }
         final RedisFuture<Long> f = getCommands().sadd(key, value);
-        if (seconds > 0) {
-            long ret = futureGet(f);
-            if (ret > 0) {
-                getCommands().expire(key, seconds);
-            }
-            return ret;
-        } else {
-            return futureGet(f);
-        }
+        return saveExpire(key, seconds, f);
     }
 
     public Set<String> getFromSet(String key) {
@@ -193,7 +195,9 @@ public class LettuceCoon {
             return false;
         }
         final RedisFuture<Boolean> f = getCommands().sismember(key, value);
-        return futureGet(f);
+
+        Boolean b = futureGet(f);
+        return b == null ? false : b;
     }
 
     public long deleteFromSet(String key, String... value) {
@@ -201,7 +205,8 @@ public class LettuceCoon {
             return -1;
         }
         final RedisFuture<Long> f = getCommands().srem(key, value);
-        return futureGet(f);
+        Long l = futureGet(f);
+        return l == null ? -1L : l;
     }
 
     /***** map *****/
@@ -234,7 +239,8 @@ public class LettuceCoon {
             return -1;
         }
         final RedisFuture<Boolean> f = getCommands().hset(key, field, value);
-        return futureGet(f) ? 1 : 0;
+        Boolean b = futureGet(f);
+        return b == null ? -1L : b ? 1L : 0;
     }
 
     public String getMapValue(String key, String field) {
@@ -252,7 +258,8 @@ public class LettuceCoon {
             return -1;
         }
         final RedisFuture<Long> f = getCommands().del(key);
-        return futureGet(f);
+        Long l = futureGet(f);
+        return l == null ? -1L : l;
     }
 
     @Deprecated
@@ -270,7 +277,8 @@ public class LettuceCoon {
 
     public long incr(String key) {
         final RedisFuture<Long> f = getCommands().incr(key);
-        return futureGet(f);
+        Long l = futureGet(f);
+        return l == null ? -1L : l;
     }
 
     public long incrBy(String key, int addValue) {
@@ -278,12 +286,14 @@ public class LettuceCoon {
             return -1;
         }
         final RedisFuture<Long> f = getCommands().incrby(key, addValue);
-        return futureGet(f);
+        Long l = futureGet(f);
+        return l == null ? -1L : l;
     }
 
     public long decr(String key) {
         final RedisFuture<Long> f = getCommands().decr(key);
-        return futureGet(f);
+        Long l = futureGet(f);
+        return l == null ? -1L : l;
     }
 
     public long decrBy(String key, int addValue) {
@@ -291,18 +301,19 @@ public class LettuceCoon {
             return -1;
         }
         final RedisFuture<Long> f = getCommands().decrby(key, addValue);
-        return futureGet(f);
+        Long l = futureGet(f);
+        return l == null ? -1L : l;
     }
 
     /**
-     * @param key
+     * @param key key
      * @return 若 key 存在，返回 1 ，否则返回 0 。
      */
 
     public boolean exists(String key) {
         final RedisFuture<Long> f = getCommands().exists(key);
-        long result = futureGet(f);
-        return result == 1;
+        Long l = futureGet(f);
+        return l != null && l == 1;
     }
 
     public long setnx(String key, String value) {
@@ -310,7 +321,8 @@ public class LettuceCoon {
             return -1;
         }
         final RedisFuture<Boolean> f = getCommands().setnx(key, value);
-        return futureGet(f) ? 1 : 0;
+        Boolean b = futureGet(f);
+        return b == null ? -1L : b ? 1L : 0;
     }
 
     public long expire(String key, int seconds) {
@@ -318,7 +330,8 @@ public class LettuceCoon {
             return -1;
         }
         final RedisFuture<Boolean> f = getCommands().expire(key, seconds);
-        return futureGet(f) ? 1 : 0;
+        Boolean b = futureGet(f);
+        return b == null ? -1L : b ? 1L : 0;
     }
 
     public <T> T eval(String script, ScriptOutputType outputType, String[] keys, String[] args) {
@@ -355,6 +368,19 @@ public class LettuceCoon {
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             log.error("Lettuce Error", e);
             return null;
+        }
+    }
+
+    private long saveExpire(String key, int seconds, RedisFuture<Long> f) {
+        Long l = futureGet(f);
+        if (seconds > 0) {
+            long length = l == null ? -1L : l;
+            if (length > 0) {
+                getCommands().expire(key, seconds);
+            }
+            return length;
+        } else {
+            return l == null ? -1L : l;
         }
     }
 }
