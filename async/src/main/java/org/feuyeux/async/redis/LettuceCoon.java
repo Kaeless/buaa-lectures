@@ -251,6 +251,15 @@ public class LettuceCoon {
         return futureGet(f);
     }
 
+    public Map<String, String> getMap(String key) {
+        if (Strings.isNullOrEmpty(key)) {
+            return null;
+        }
+        final RedisFuture<Map<String, String>> f = getCommands().hgetall(key);
+        return futureGet(f);
+    }
+
+
     /***** common *****/
 
     public long deleteKey(String key) {
