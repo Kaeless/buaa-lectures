@@ -1,5 +1,6 @@
 package org.feuyeux.async.redis;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.feuyeux.async.pool.ThreadCoon;
 import org.junit.After;
@@ -21,8 +22,8 @@ public class TestRedisClient {
     @Before
     public void before() {
         RedisConfig redisProps = new RedisConfig();
-        redisProps.setHost("");
-        redisProps.setPwd("");
+        redisProps.setHost("rm-tatuds.redis.rdstest.tbsite.net");
+        redisProps.setPwd("kvStore17");
         redisProps.setPort(6379);
         redisProps.setConnectionTimeout(1000);
         lettuceCoon = new LettuceCoon(redisProps);
@@ -38,11 +39,31 @@ public class TestRedisClient {
 
     @Test
     public void testCommand() {
-        lettuceCoon.pushToQueue(key, value, 3);
-        Assert.assertNotNull(lettuceCoon.getQueue(key));
-        lettuceCoon.popFromQueue(key);
-        Assert.assertTrue(lettuceCoon.getQueue(key).isEmpty());
+        testSetExpire();
 
+//        testKv();
+//
+//        testQueue();
+//
+//        testSet();
+//
+//        testMap();
+//
+//        tests();
+    }
+
+    private void tests() {
+        lettuceCoon.saveString(key, "1");
+        lettuceCoon.incr(key);
+        lettuceCoon.incrBy(key, 2);
+        lettuceCoon.expire(key, 10000);
+        String s = lettuceCoon.readString(key);
+        //Assert.assertEquals("4", s); TODO jedis return 1
+        Assert.assertTrue(lettuceCoon.exists(key));
+        Assert.assertEquals(0L, lettuceCoon.setnx(key, "2"));
+    }
+
+    private void testKv() {
         String r0 = lettuceCoon.saveString(key, "hello world", 1000);
         log.info("lettuceCoon.saveString:{}", r0);
         String r1 = lettuceCoon.readString(key);
@@ -54,6 +75,58 @@ public class TestRedisClient {
         Assert.assertEquals("hello world", r1);
         long r3 = lettuceCoon.deleteKey(key2);
         log.info("lettuceCoon.deleteKey:{}", r3);
+    }
+
+    private void testSet() {
+        log.info("lettuceCoon.addToSet");
+        lettuceCoon.addToSet(key, "1", "2", "3");
+        log.info("lettuceCoon.getFromSet");
+        Set<String> s1 = lettuceCoon.getFromSet(key);
+        Long l2 = lettuceCoon.getSetSize(key);
+        Assert.assertEquals(l2.intValue(), s1.size());
+
+        boolean b1 = lettuceCoon.isSetMember(key, "1");
+        log.info("lettuceCoon.isSetMember:{}", b1);
+        lettuceCoon.deleteFromSet(key, "2", "3");
+        Assert.assertEquals(1L, lettuceCoon.getSetSize(key).longValue());
+        lettuceCoon.deleteKey(key);
+    }
+
+    @SneakyThrows
+    private void testSetExpire() {
+        lettuceCoon.addToSet(key, 1, "2", "1", "3");
+        Set<String> fromSet = lettuceCoon.getFromSet(key);
+        log.info("fromSet={}", fromSet);
+        TimeUnit.SECONDS.sleep(1);
+        Assert.assertTrue(lettuceCoon.getFromSet(key).isEmpty());
+        lettuceCoon.addToSet(key, 1, "1.2.3.4");
+        lettuceCoon.addToSet(key, 2, "2.2.3.4");
+        lettuceCoon.addToSet(key, 1, "1.2.3.4");
+        lettuceCoon.addToSet(key, 3, "3.2.3.4");
+        TimeUnit.SECONDS.sleep(2);
+        fromSet = lettuceCoon.getFromSet(key);
+        log.info("fromSet={}", fromSet);
+        Assert.assertEquals(3, fromSet.size());
+    }
+
+    private void testMap() {
+        Map<String, String> map = new HashMap<>();
+        map.put("1", "one");
+        String s0 = lettuceCoon.saveMap(key, map);
+        log.info("lettuceCoon.saveMap:{}", s0);
+        String s2 = lettuceCoon.getMapValue(key, "1");
+        lettuceCoon.setMapValue(key, "1", "一");
+        String s3 = lettuceCoon.getMapValue(key, "1");
+        Assert.assertEquals("one", s2);
+        Assert.assertEquals("一", s3);
+        lettuceCoon.deleteKey(key);
+    }
+
+    private void testQueue() {
+        lettuceCoon.pushToQueue(key, value, 3);
+        Assert.assertNotNull(lettuceCoon.getQueue(key));
+        lettuceCoon.popFromQueue(key);
+        Assert.assertTrue(lettuceCoon.getQueue(key).isEmpty());
 
         lettuceCoon.pushToQueue(key, "1");
         lettuceCoon.pushToQueue(key, "2");
@@ -77,40 +150,6 @@ public class TestRedisClient {
         long l1 = lettuceCoon.getQueueLength(key);
         log.info("lettuceCoon.getQueueLength:{}", l1);
         lettuceCoon.deleteKey(key);
-
-        log.info("lettuceCoon.addToSet");
-        lettuceCoon.addToSet(key, "1", "2", "3");
-        lettuceCoon.addToSet(key, 1000, "1", "2", "3");
-        log.info("lettuceCoon.getFromSet");
-        Set<String> s1 = lettuceCoon.getFromSet(key);
-        Long l2 = lettuceCoon.getSetSize(key);
-        Assert.assertEquals(l2.intValue(), s1.size());
-
-        boolean b1 = lettuceCoon.isSetMember(key, "1");
-        log.info("lettuceCoon.isSetMember:{}", b1);
-        lettuceCoon.deleteFromSet(key, "2", "3");
-        Assert.assertEquals(1L, lettuceCoon.getSetSize(key).longValue());
-        lettuceCoon.deleteKey(key);
-
-        Map<String, String> map = new HashMap<>();
-        map.put("1", "one");
-        String s0 = lettuceCoon.saveMap(key, map);
-        log.info("lettuceCoon.saveMap:{}", s0);
-        String s2 = lettuceCoon.getMapValue(key, "1");
-        lettuceCoon.setMapValue(key, "1", "一");
-        String s3 = lettuceCoon.getMapValue(key, "1");
-        Assert.assertEquals("one", s2);
-        Assert.assertEquals("一", s3);
-        lettuceCoon.deleteKey(key);
-
-        lettuceCoon.saveString(key, "1");
-        lettuceCoon.incr(key);
-        lettuceCoon.incrBy(key, 2);
-        lettuceCoon.expire(key, 10000);
-        String s = lettuceCoon.readString(key);
-        //Assert.assertEquals("4", s); TODO jedis return 1
-        Assert.assertTrue(lettuceCoon.exists(key));
-        Assert.assertEquals(0L, lettuceCoon.setnx(key, "2"));
     }
 
     @Test
