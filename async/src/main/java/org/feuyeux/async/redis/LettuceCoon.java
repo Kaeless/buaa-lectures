@@ -259,6 +259,13 @@ public class LettuceCoon {
         return futureGet(f);
     }
 
+    public Long deleteFromMap(String key, String... fields) {
+        if (Strings.isNullOrEmpty(key) || fields == null) {
+            return null;
+        }
+        final RedisFuture<Long> f = getCommands().hdel(key, fields);
+        return futureGet(f);
+    }
 
     /***** common *****/
 
