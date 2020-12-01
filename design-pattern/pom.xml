@@ -10,7 +10,7 @@
     <artifactId>design-pattern</artifactId>
     <properties>
         <junit.version>4.13.1</junit.version>
-        <log4j2.version>2.10.0</log4j2.version>
+        <log4j2.version>2.13.2</log4j2.version>
         <lombok.version>1.18.2</lombok.version>
         <spring-beans.version>5.0.8.RELEASE</spring-beans.version>
         <jdk.version>1.8</jdk.version>
